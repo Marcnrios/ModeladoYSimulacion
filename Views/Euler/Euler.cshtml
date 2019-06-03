@@ -1,0 +1,151 @@
+
+@model ParametersViewModel  
+@{  
+    var EulerMejoradoX = Model.EulerMejoradoPoints !=null ? Newtonsoft.Json.JsonConvert.SerializeObject( Model.EulerMejoradoPoints.Select( x => x.x ).ToList() ) : null;  
+    var EulerMejoradoY = Model.EulerMejoradoPoints !=null ? Newtonsoft.Json.JsonConvert.SerializeObject( Model.EulerMejoradoPoints.Select( x => x.y ).ToList() ) : null;  
+    var EulerX = Model.EulerPoints !=null ? Newtonsoft.Json.JsonConvert.SerializeObject( Model.EulerPoints.Select( x => x.x ).ToList() ) : null;  
+    var EulerY = Model.EulerPoints !=null ? Newtonsoft.Json.JsonConvert.SerializeObject( Model.EulerPoints.Select( x => x.y ).ToList() ) : null;  
+    ViewData["Title"] = "Euler";  
+}  
+  
+<!DOCTYPE html>  
+  
+<html>  
+<body>  
+<form asp-action="Euler" method="POST">   
+    <div class="form-group">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="a" class="col-md-12 control-label" style="margin-top: 8px;">a (Valor inicial de t)</label>
+                <div class="col-md-11" style="margin-top: 5px; margin-bottom: 5px;">
+                    <input asp-for="a" class="form-control" />
+                </div>
+            </div>  
+            <div class="form-group">
+                <label asp-for="b" class="col-md-12 control-label" style="margin-top: 10px;">b (Valor final de t)</label>
+                <div class="col-md-11" style="margin-top: 5px; margin-bottom: 5px;">
+                    <input asp-for="b" class="form-control" />
+                </div>
+            </div>  
+            <div class="form-group">
+                <label asp-for="h" class="col-md-12 control-label" style="margin-top: 10px;">h (Intervalo)</label>
+                <div class="col-md-11" style="margin-top: 5px; margin-bottom: 5px;">
+                    <input asp-for="h" class="form-control" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="xt" class="col-md-12 control-label" style="margin-top: 10px;">x0 (Valor inicial de x)</label>
+                <div class="col-md-11" style="margin-top: 5px; margin-bottom: 5px;">
+                    <input asp-for="xt" class="form-control" />
+                </div>
+            </div>  
+            <div class="form-group">
+                <label asp-for="function" class="col-md-12 control-label" style="margin-top: 10px;">Función</label>
+                <div class="col-md-11" style="margin-top: 5px; margin-bottom: 5px;">
+                    <input asp-for="function" class="form-control" />
+                </div>
+            </div>  
+            <div class="form-group">
+                <div class="col-md-12" style="margin-top: 20px;">
+                    <input type="submit" value="Calcular" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 box-body">  
+            <div class="chart-container">  
+                <canvas id="myChart" style="width:100%; height:500px"></canvas>  
+            </div>  
+        </div>
+    </div>
+</form>
+    
+
+</body>  
+</html>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>  
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>  
+  
+<script type="text/javascript">  
+$(function () {
+    var xEulerMejorado = [];
+    var yEulerMejorado = [];
+    var xEuler = [];
+    var yEuler = [];
+    xEulerMejorado = @Html.Raw(EulerMejoradoX);
+    yEulerMejorado = @Html.Raw(EulerMejoradoY);
+    xEuler = @Html.Raw(EulerX);
+    yEuler = @Html.Raw(EulerY);
+    var puntosEulerMejorado = [];
+    var puntosEuler = [];
+    var i=0,k = 0;
+    while(i < xEulerMejorado.length)
+    {
+        x = xEulerMejorado[i];
+        y = yEulerMejorado[i];
+        var json = {x: x, y: y};
+        puntosEulerMejorado.push(json);    
+        i++
+    }
+    debugger
+    while(k < xEuler.length)
+    {
+        x = xEuler[k];
+        y = yEuler[k];
+        var json = {x: x, y: y};
+        puntosEuler.push(json);    
+        k++
+    }
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'linear',
+                    position: 'bottom',
+                    display: true,
+                    gridLines: {
+        zeroLineColor: '#333'
+    },
+    scaleLabel: {
+        display: true,
+        labelString: 't'
+      }
+                }],
+                yAxes: [{
+                    type: 'linear',
+                    display: true,
+                    position: 'bottom',
+                    gridLines: {
+        zeroLineColor: '#333'
+    },
+    scaleLabel: {
+        display: true,
+        labelString: 'x'
+      }
+                }],
+            }
+        },
+        data: {
+            datasets: [{
+                label: "Euler Mejorado",  
+                data: puntosEulerMejorado,
+                borderColor: 'red',
+                borderWidth: 2,
+                fill: false,
+                showLine: true,
+                pointBackgroundColor: 'red'
+            },
+            {
+                label: "Euler",  
+                data: puntosEuler,
+                borderColor: 'blue',
+                borderWidth: 2,
+                fill: false,
+                showLine: true,
+                pointBackgroundColor: 'blue'
+            }],     
+        },
+        type: 'scatter'
+    });
+})
+</script>  
